@@ -5,18 +5,18 @@ using System.Linq;
 
 public class Inventory
 {
-    private List<InventoryItem> inventory { get; set; }
+    private List<InventoryItem> Inv { get; set; }
 
-    public int InventorySize => inventory.Count;
+    public int InventorySize => Inv.Count;
 
-    public bool HaveSpace { get { return inventory.Any(x => x.id == 0); } }
+    public bool HaveSpace { get { return Inv.Any(x => x.Id == 0); } }
 
     public Inventory(int size)
     {
-        inventory = new List<InventoryItem>();
+        Inv = new List<InventoryItem>();
         for (int i = 0; i < size; i++)
         {
-            inventory.Add(new InventoryItem());
+            Inv.Add(new InventoryItem());
         }
     }
 
@@ -25,10 +25,17 @@ public class Inventory
     /// </summary>
     /// <param name="itemId">Id target item</param>
     /// <param name="count">Item count</param>
-    public void AddItem(int itemId, int count)
+    /// <returns>true if getting item, false if cant get item</returns>
+    public bool AddItem(int itemId, int count)
     {
         InventoryItem targetSlot = GetTargetSlot(itemId);
-        targetSlot.SetItem(itemId, count);
+        if(targetSlot != null)
+        {
+            targetSlot.SetItem(itemId, count);
+            GameEvents.OnUpdateSlotImage?.Invoke();
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -37,7 +44,7 @@ public class Inventory
     /// <param name="index">Inventory slot index for items remove</param>
     public void RemoveItem(int index)
     {
-        inventory[index].RemoveItem();
+        Inv[index].RemoveItem();
     }
 
     /// <summary>
@@ -47,37 +54,43 @@ public class Inventory
     /// <param name="endSlot">Target slot id</param>
     public void MoveItemTo(int startSlot, int endSlot)
     {
-        int startId = inventory[startSlot].id;
-        int startCount = inventory[startSlot].count;
+        int startId = Inv[startSlot].Id;
+        int startCount = Inv[startSlot].Count;
 
-        inventory[startSlot].SetItem(inventory[endSlot].id, inventory[endSlot].count);
-        inventory[endSlot].SetItem(startId, startCount);
+        Inv[startSlot].SetItem(Inv[endSlot].Id, Inv[endSlot].Count);
+        Inv[endSlot].SetItem(startId, startCount);
     }
 
     private InventoryItem GetTargetSlot(int itemId)
     {
         //try find first slot with itemId
-        InventoryItem target = inventory.FirstOrDefault(x => x.id == itemId);
+        InventoryItem target = Inv.FirstOrDefault(x => x.Id == itemId);
 
         //If inventory not contains item with itemId find first free slot
         if(target == null)
         {
-            target = inventory.FirstOrDefault(x => x.id == 0);
+            target = Inv.FirstOrDefault(x => x.Id == 0);
         }
 
         return target;
+    }
+
+    public int GetItemIdInSlot(int slotIndex)
+    {
+        if (slotIndex > Inv.Count) return 0;
+        return Inv[slotIndex].Id;
     }
 }
 
 public class InventoryItem
 {
-    public int id { get; private set; }
-    public int count { get; private set; }
+    public int Id { get; private set; }
+    public int Count { get; private set; }
 
     public InventoryItem(int id = 0, int count = 0)
     {
-        this.id = id;
-        this.count = count;
+        this.Id = id;
+        this.Count = count;
     }
 
     /// <summary>
@@ -87,8 +100,8 @@ public class InventoryItem
     /// <param name="itemCount">Target item count</param>
     public void SetItem(int itemId, int itemCount)
     {
-        id = itemId;
-        count += itemCount;
+        Id = itemId;
+        Count += itemCount;
     }
 
     /// <summary>
@@ -96,7 +109,7 @@ public class InventoryItem
     /// </summary>
     public void RemoveItem()
     {
-        id = 0;
-        count = 0;
+        Id = 0;
+        Count = 0;
     }
 }

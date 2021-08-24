@@ -36,14 +36,14 @@ public class TDCharacterController : TDCharacterMovement
             GetClickPoint(interractLayer, out RaycastHit hit);
             if (hit.transform != null)
             {
-                hit.transform.GetComponent<IInterractable>().Get(); //Temporary action
+                hit.transform.GetComponent<IInterractable>().Interract();
             }
         }
     }
 
     private void Move()
     {
-        if (Input.GetMouseButtonDown((int)moveButton))
+        if (Input.GetMouseButtonDown((int)moveButton) && !GameStates.inventoryOpen)
         {
             GetClickPoint(movableLayer, out RaycastHit hit);
 

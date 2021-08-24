@@ -23,10 +23,17 @@ public class PlayerInventoryUI : MonoBehaviour
     protected void ShowHideInventory()
     {
         inventorySlotsContainer.parent.gameObject.SetActive(!inventorySlotsContainer.parent.gameObject.activeSelf);
+        GameStates.inventoryOpen = inventorySlotsContainer.parent.gameObject.activeSelf;
     }
 
     private void SetSlotState(int slotIndex, bool state)
     {
         inventorySlotsContainer.GetChild(slotIndex).gameObject.SetActive(state);
+        SetSlotIndex(slotIndex);
+    }
+
+    private void SetSlotIndex(int slotIndex)
+    {
+        inventorySlotsContainer.GetChild(slotIndex).gameObject.GetComponent<Slot>().SetIndex(slotIndex);
     }
 }
