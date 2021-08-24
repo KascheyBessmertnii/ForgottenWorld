@@ -1,5 +1,4 @@
 public interface IAnimator
 {
-    public void PlayWalk();
-    public void PlayIDLE();
+    public void Walk(float value);
 }

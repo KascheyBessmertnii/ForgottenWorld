@@ -9,10 +9,7 @@ public class TDCharacterMovement : MonoBehaviour
 
     private void LateUpdate()
     {
-        if(agent.remainingDistance < agent.stoppingDistance)
-        {
-            animator.PlayIDLE();
-        }
+        animator.Walk(agent.velocity.magnitude);
     }
 
     void Start()
@@ -24,7 +21,6 @@ public class TDCharacterMovement : MonoBehaviour
     protected void MoveTo(Vector3 position, float speed)
     {
         agent.speed = speed;
-        agent.SetDestination(position);
-        animator.PlayWalk();
+        agent.SetDestination(position);    
     }
 }
