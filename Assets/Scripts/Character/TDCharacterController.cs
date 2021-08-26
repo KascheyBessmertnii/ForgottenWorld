@@ -15,7 +15,7 @@ public class TDCharacterController : TDCharacterMovement
 
     private void Awake()
     {
-        mCamera = Camera.main;
+        Utilits.mainCamera = mCamera = Camera.main;
     }
 
     private void Update()
@@ -33,11 +33,7 @@ public class TDCharacterController : TDCharacterMovement
     {
         if (Input.GetMouseButtonDown((int)interractButton))
         {
-            GetClickPoint(interractLayer, out RaycastHit hit);
-            if (hit.transform != null)
-            {
-                hit.transform.GetComponent<IInterractable>().Interract();
-            }
+            Utilits.GetSceneClickPoint(interractLayer, 100f).transform?.GetComponent<IInterractable>().Interract();
         }
     }
 
@@ -45,20 +41,7 @@ public class TDCharacterController : TDCharacterMovement
     {
         if (Input.GetMouseButtonDown((int)moveButton) && !GameStates.inventoryOpen)
         {
-            GetClickPoint(movableLayer, out RaycastHit hit);
-
-            MoveTo(hit.point, speed);
-        }
-    }
-
-    private void GetClickPoint(LayerMask layer, out RaycastHit hit)
-    {
-        hit = default;
-        Ray ray = mCamera.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hitPoint, 100f, layer))
-        {
-            hit = hitPoint;
+            MoveTo(Utilits.GetSceneClickPoint(movableLayer, 100f).point, speed);
         }
     }
 }

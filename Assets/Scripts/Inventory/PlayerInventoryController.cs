@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class PlayerInventoryController : PlayerInventoryUI, IInventory
+public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
 {
+    #region Singleton
     public static PlayerInventoryController Instance { get; private set; } = null;
 
     private void Awake()
@@ -9,6 +10,7 @@ public class PlayerInventoryController : PlayerInventoryUI, IInventory
         if (Instance == null)
             Instance = this;
     }
+    #endregion
 
     [Header("Inventory parameters")]
     [SerializeField, Range(5, 20)] private int inventorySize = 5;
@@ -16,7 +18,9 @@ public class PlayerInventoryController : PlayerInventoryUI, IInventory
     [SerializeField] private KeyCode inventoryOpenButton = KeyCode.I;
 
     private Inventory inventory;
+    private Equipment equipment;
     private GameItemsList itemList;
+    private Transform playerPos = default;
 
     private void OnEnable()
     {
@@ -37,8 +41,12 @@ public class PlayerInventoryController : PlayerInventoryUI, IInventory
     private void Start()
     {
         inventory = new Inventory(inventorySize);
-        InitializeSlots(inventorySize);
+        equipment = new Equipment(equipmentSlotContainer.childCount);
+        InitializeSlots(inventorySize, equipmentSlotContainer.childCount);
+
         itemList = GameItemsList.Instance;
+
+        playerPos = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     private void Update()
@@ -51,14 +59,56 @@ public class PlayerInventoryController : PlayerInventoryUI, IInventory
 
     private bool GetItem(GameItem item)
     {
-        if (item == null) return false;
-        return inventory.AddItem(item.Item.id, item.Count);
+        return item == null ? false : inventory.AddItem(item.Item.id, item.Count);
     }
 
-    public Sprite GetItemSprite(int slotIndex)
+    public ItemSO GetSlotItem(Slot slot)
     {
-        int itemId = inventory.GetItemIdInSlot(slotIndex);
-        if (itemId == 0) return null;
-        return itemList.GetItemByID(itemId).icon;
+        Inventory targetInv = GetTargetInventory(slot);
+        return targetInv.GetItemInSlot(slot.Index);
+    }
+
+    public ItemSO GetEquipSlotItem(int slotIndex)
+    {
+        int itemId = equipment.GetItemIdInSlot(slotIndex);
+        return itemId == 0 ? null : itemList.GetItemByID(itemId);
+    }
+
+    public void DropItemToGround(Slot slot)
+    {
+        Inventory targetInv = GetTargetInventory(slot);
+        var item = targetInv.GetItemInSlot(slot.Index);
+        //Instantiate dropped item forward player in 0.5m
+        Instantiate(item.prefab, playerPos.position + playerPos.forward * 0.5f, Quaternion.identity);
+        targetInv.RemoveItem(slot.Index);
+    }
+
+    public void ChangeItemPlace(Slot startSlot, Slot endSlot)
+    {
+        Inventory startObj = GetTargetInventory(startSlot);
+        Inventory targetObj = GetTargetInventory(endSlot);
+        if (CanPlaceItem(startSlot, endSlot, startObj))
+        {
+            int tmpItem = startObj.GetItemIdInSlot(startSlot.Index);
+            int tmpCount = startObj.GetItemsCountInSlot(startSlot.Index);
+
+            startObj.PlaceItemInSlot(targetObj.GetItemIdInSlot(endSlot.Index), targetObj.GetItemsCountInSlot(endSlot.Index), startSlot.Index);
+            targetObj.PlaceItemInSlot(tmpItem, tmpCount, endSlot.Index);
+        }
+    }
+
+    private Inventory GetTargetInventory(Slot slot)
+    {
+        if (slot.GetSlotType() == EquipmentType.None)
+            return inventory;
+        return equipment;
+    }
+
+    private bool CanPlaceItem(Slot startSlot, Slot endSlot, Inventory startInv)
+    {
+        if (endSlot.GetSlotType() == EquipmentType.None) return true; //If move to inventory (backpack) always return true.
+
+        var startItem = startInv.GetItemInSlot(startSlot.Index);
+        return startItem.EquipmentSlot() == endSlot.GetSlotType(); //If move to eqipment and type equals return true.
     }
 }

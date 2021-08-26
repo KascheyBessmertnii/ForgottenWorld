@@ -5,7 +5,7 @@ using System.Linq;
 
 public class Inventory
 {
-    private List<InventoryItem> Inv { get; set; }
+    protected List<InventoryItem> Inv { get; set; }
 
     public int InventorySize => Inv.Count;
 
@@ -26,7 +26,7 @@ public class Inventory
     /// <param name="itemId">Id target item</param>
     /// <param name="count">Item count</param>
     /// <returns>true if getting item, false if cant get item</returns>
-    public bool AddItem(int itemId, int count)
+    public virtual bool AddItem(int itemId, int count)
     {
         InventoryItem targetSlot = GetTargetSlot(itemId);
         if(targetSlot != null)
@@ -37,7 +37,10 @@ public class Inventory
         }
         return false;
     }
-
+    public virtual void PlaceItemInSlot(int itemId, int count, int slotIndex)
+    {
+        Inv[slotIndex] = new InventoryItem(itemId, count);
+    }
     /// <summary>
     /// Remove items from target slot inventory
     /// </summary>
@@ -46,12 +49,11 @@ public class Inventory
     {
         Inv[index].RemoveItem();
     }
-
     /// <summary>
     /// Move items from start slot to target slot
     /// </summary>
-    /// <param name="startSlot">Start slot id</param>
-    /// <param name="endSlot">Target slot id</param>
+    /// <param name="startSlot">Start slot index</param>
+    /// <param name="endSlot">Target slot index</param>
     public void MoveItemTo(int startSlot, int endSlot)
     {
         int startId = Inv[startSlot].Id;
@@ -60,25 +62,27 @@ public class Inventory
         Inv[startSlot].SetItem(Inv[endSlot].Id, Inv[endSlot].Count);
         Inv[endSlot].SetItem(startId, startCount);
     }
-
-    private InventoryItem GetTargetSlot(int itemId)
+    public int GetItemIdInSlot(int slotIndex)
+    {
+        return Inv?[slotIndex].Id ?? 0;
+    }
+    public ItemSO GetItemInSlot(int slotIndex)
+    {
+        if (slotIndex > Inv.Count) return null;
+        return GameItemsList.Instance.GetItemByID(Inv[slotIndex].Id);
+    }
+    public int GetItemsCountInSlot(int slotIndex)
+    {
+        return Inv?[slotIndex].Count ?? 0;
+    }
+    
+    protected virtual InventoryItem GetTargetSlot(int itemId)
     {
         //try find first slot with itemId
         InventoryItem target = Inv.FirstOrDefault(x => x.Id == itemId);
 
         //If inventory not contains item with itemId find first free slot
-        if(target == null)
-        {
-            target = Inv.FirstOrDefault(x => x.Id == 0);
-        }
-
-        return target;
-    }
-
-    public int GetItemIdInSlot(int slotIndex)
-    {
-        if (slotIndex > Inv.Count) return 0;
-        return Inv[slotIndex].Id;
+        return target ?? Inv.FirstOrDefault(x => x.Id == 0);
     }
 }
 

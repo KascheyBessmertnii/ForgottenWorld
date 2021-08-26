@@ -3,9 +3,10 @@ using UnityEngine;
 public class PlayerInventoryUI : MonoBehaviour
 {
     [Header("Inventory UI section")]
-    [SerializeField] private Transform inventorySlotsContainer;
+    [SerializeField] protected Transform inventorySlotsContainer = default;
+    [SerializeField] protected Transform equipmentSlotContainer = default;
 
-    protected void InitializeSlots(int inventorySize)
+    protected void InitializeSlots(int inventorySize, int equipmentSize)
     {
         if (inventorySlotsContainer == null)
         {
@@ -13,27 +14,34 @@ public class PlayerInventoryUI : MonoBehaviour
             return;
         }
 
-        //Set visibility for inventory slots by inventory size
-        for (int i = 0; i < inventorySlotsContainer.childCount; i++)
+        if (equipmentSlotContainer == null)
         {
-            SetSlotState(i, i < inventorySize);
+            Debug.LogError("Not set equipment slots panel!");
+            return;
         }
+
+        SetSlotsState(inventorySlotsContainer, inventorySize);
+        SetSlotsState(equipmentSlotContainer, equipmentSize);
     }
 
     protected void ShowHideInventory()
     {
         inventorySlotsContainer.parent.gameObject.SetActive(!inventorySlotsContainer.parent.gameObject.activeSelf);
+        equipmentSlotContainer.parent.gameObject.SetActive(!equipmentSlotContainer.parent.gameObject.activeSelf);
         GameStates.inventoryOpen = inventorySlotsContainer.parent.gameObject.activeSelf;
     }
 
-    private void SetSlotState(int slotIndex, bool state)
+    private void SetSlotsState(Transform slotsContainer, int size)
     {
-        inventorySlotsContainer.GetChild(slotIndex).gameObject.SetActive(state);
-        SetSlotIndex(slotIndex);
+        for (int i = 0; i < slotsContainer.childCount; i++)
+        {
+            slotsContainer.GetChild(i).gameObject.SetActive(i < size);
+            SetSlotIndex(slotsContainer, i);
+        }
     }
 
-    private void SetSlotIndex(int slotIndex)
+    private void SetSlotIndex(Transform parent,int slotIndex)
     {
-        inventorySlotsContainer.GetChild(slotIndex).gameObject.GetComponent<Slot>().SetIndex(slotIndex);
+        parent.GetChild(slotIndex).gameObject.GetComponent<ISlot>().SetIndex(slotIndex);
     }
 }

@@ -2,15 +2,16 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Slot : MonoBehaviour, ISlot, IPointerClickHandler
+public class Slot : MonoBehaviour, ISlot, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
-    [SerializeField] private Image slotImage;
+    [SerializeField] protected Image slotImage = default;
 
-    private int index = -1;
-    private Sprite defaultSprite = null;
-    private PlayerInventoryController inventory;
+    protected int index = -1;
+    protected Sprite defaultSprite = null;
+    protected PlayerInventoryController inventory;
 
     public int Index => index;
+    public Sprite Icon => slotImage.sprite;
 
     private void OnEnable()
     {
@@ -31,29 +32,68 @@ public class Slot : MonoBehaviour, ISlot, IPointerClickHandler
 
     public virtual void OnPointerClick(PointerEventData eventData)
     {
-        GameEvents.OnShowItemInfo?.Invoke("Click to slot with index " + index);
+        //If slots not empty show item info
+        ItemSO item = inventory.GetSlotItem(this) ;
+
+        ShowInfoEvent(item == null ? "" : item.GetItemInfo());
     }
 
-    public void SetIndex(int index)
+    public virtual void SetIndex(int index)
     {
         this.index = index;
     }
 
+    public virtual EquipmentType GetSlotType()
+    {
+        return EquipmentType.None;
+    }
+
+    /// <summary>
+    /// Update slot item icon
+    /// </summary>
+    /// <param name="icon">if icon is null will be set default slot image</param>
     public void ShowIcon(Sprite icon)
     {
-        if (icon != null)
+        slotImage.sprite = icon ?? defaultSprite;
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        GameEvents.OnBeginDrag?.Invoke(this);
+        ShowIcon(null);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (eventData.pointerEnter == null)
         {
-            slotImage.sprite = icon;
+            EndDragEvent(null); //If drop not in inventory slot set insdex as -1      
         }
         else
         {
-            slotImage.sprite = defaultSprite;
+            var obj = eventData.pointerEnter.transform.GetComponent<Slot>(); //Check object under cursor
+            EndDragEvent(obj ?? this); //If its slot, move to slot else return item to current slot
         }
+
+        UpdateIcon();
     }
 
-    private void UpdateIcon()
+    public void OnDrag(PointerEventData eventData)
     {
-        if (index >= 0)
-            ShowIcon(inventory.GetItemSprite(index));
+    }
+
+    protected virtual void UpdateIcon()
+    {
+        if (index < 0) return;
+        ItemSO item = inventory.GetSlotItem(this);
+        ShowIcon(item?.icon);
+    }
+    protected void EndDragEvent(Slot slot)
+    {
+        GameEvents.OnEndDrag?.Invoke(slot);
+    }
+    protected void ShowInfoEvent(string text)
+    {
+        GameEvents.OnShowItemInfo?.Invoke(text);
     }
 }

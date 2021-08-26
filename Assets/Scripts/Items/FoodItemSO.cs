@@ -9,6 +9,13 @@ public class FoodItemSO : ItemSO
     {
         return food;
     }
+
+    public override string GetItemInfo()
+    {
+        string result = base.GetItemInfo();
+        result += string.Format("\nУталяет {0} единиц голода", food.value.ToString());
+        return result;
+    }
 }
 
 [System.Serializable]

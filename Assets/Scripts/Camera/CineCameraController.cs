@@ -4,7 +4,7 @@ using Cinemachine;
 public class CineCameraController : MonoBehaviour
 {
     [Header("Camera settings")]
-    [SerializeField, Tooltip("Reference Free Look camera")] private CinemachineFreeLook flCamera;
+    [SerializeField, Tooltip("Reference Free Look camera")] private CinemachineFreeLook flCamera = default;
     [SerializeField] private MouseButtons cameraRotateButton = MouseButtons.Middle;
     [SerializeField, Tooltip("Camera zoom speed"), Range(0,60f)] private float zoomSpeed = 5f;
 
