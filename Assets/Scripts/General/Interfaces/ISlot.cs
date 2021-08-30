@@ -1,4 +1,4 @@
-public interface ISlot : IShowIcon
+public interface ISlot : IShowIcon, IHaveType
 {
     int Index { get;}
 

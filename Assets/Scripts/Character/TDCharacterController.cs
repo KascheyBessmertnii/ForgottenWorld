@@ -12,6 +12,7 @@ public class TDCharacterController : TDCharacterMovement
     [SerializeField] private LayerMask interractLayer;
 
     private Camera mCamera;
+    private bool crouch = false;
 
     private void Awake()
     {
@@ -20,28 +21,24 @@ public class TDCharacterController : TDCharacterMovement
 
     private void Update()
     {
-        CheckClick();
-    }
-
-    private void CheckClick()
-    {
         Move();
-        Interract();
-    }
-
-    private void Interract()
-    {
-        if (Input.GetMouseButtonDown((int)interractButton))
-        {
-            Utilits.GetSceneClickPoint(interractLayer, 100f).transform?.GetComponent<IInterractable>().Interract();
-        }
+        MouseAction.Interract((int)interractButton, interractLayer);
+        Crouch();
     }
 
     private void Move()
     {
         if (Input.GetMouseButtonDown((int)moveButton) && !GameStates.inventoryOpen)
         {
-            MoveTo(Utilits.GetSceneClickPoint(movableLayer, 100f).point, speed);
+            MoveTo(MouseAction.Move(movableLayer), speed);
         }
+    }
+
+    private void Crouch()
+    {
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            animator.Crouching(crouch = !crouch);
+        }       
     }
 }

@@ -43,6 +43,7 @@ public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
         inventory = new Inventory(inventorySize);
         equipment = new Equipment(equipmentSlotContainer.childCount);
         InitializeSlots(inventorySize, equipmentSlotContainer.childCount);
+        InitializeEquipmentSlotsType(equipment.InventorySize, ref equipment);
 
         itemList = GameItemsList.Instance;
 
@@ -57,15 +58,19 @@ public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
         }
     }
 
+    /// <summary>
+    /// Get item from ground and place in first empty slot or slot that contains equal item
+    /// </summary>
+    /// <param name="item">target item</param>
+    /// <returns>TRUE if can add item to inventory or FALSE if not</returns>
     private bool GetItem(GameItem item)
     {
         return item == null ? false : inventory.AddItem(item.Item.id, item.Count);
     }
 
-    public ItemSO GetSlotItem(Slot slot)
+    public ItemSO GetSlotItem(SlotUI slot)
     {
-        Inventory targetInv = GetTargetInventory(slot);
-        return targetInv.GetItemInSlot(slot.Index);
+        return GetTargetInventory(slot)?.GetItemInSlot(slot.Index);
     }
 
     public ItemSO GetEquipSlotItem(int slotIndex)
@@ -74,7 +79,7 @@ public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
         return itemId == 0 ? null : itemList.GetItemByID(itemId);
     }
 
-    public void DropItemToGround(Slot slot)
+    public void DropItemToGround(SlotUI slot)
     {
         Inventory targetInv = GetTargetInventory(slot);
         var item = targetInv.GetItemInSlot(slot.Index);
@@ -83,11 +88,16 @@ public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
         targetInv.RemoveItem(slot.Index);
     }
 
-    public void ChangeItemPlace(Slot startSlot, Slot endSlot)
+    public void ChangeItemPlace(SlotUI startSlot, SlotUI endSlot)
     {
         Inventory startObj = GetTargetInventory(startSlot);
         Inventory targetObj = GetTargetInventory(endSlot);
-        if (CanPlaceItem(startSlot, endSlot, startObj))
+
+        bool CanPlaceInStartSlot = startObj.CanPlaceItem(targetObj.GetItemIdInSlot(endSlot.Index), startSlot.Index);
+        bool CanPlaceInEndSlot = targetObj.CanPlaceItem(startObj.GetItemIdInSlot(startSlot.Index), endSlot.Index);
+
+        if ( CanPlaceInStartSlot && CanPlaceInEndSlot)
+        //if (CanPlaceItem(startSlot, endSlot, startObj))
         {
             int tmpItem = startObj.GetItemIdInSlot(startSlot.Index);
             int tmpCount = startObj.GetItemsCountInSlot(startSlot.Index);
@@ -97,14 +107,12 @@ public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
         }
     }
 
-    private Inventory GetTargetInventory(Slot slot)
+    private Inventory GetTargetInventory(SlotUI slot)
     {
-        if (slot.GetSlotType() == EquipmentType.None)
-            return inventory;
-        return equipment;
+        return slot.GetSlotType() == EquipmentType.None ? inventory : equipment;
     }
 
-    private bool CanPlaceItem(Slot startSlot, Slot endSlot, Inventory startInv)
+    private bool CanPlaceItem(SlotUI startSlot, SlotUI endSlot, Inventory startInv)
     {
         if (endSlot.GetSlotType() == EquipmentType.None) return true; //If move to inventory (backpack) always return true.
 

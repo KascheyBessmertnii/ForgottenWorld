@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class EquipmentSlot : Slot
+public class EquipmentSlotUI : SlotUI
 {
     [SerializeField] private EquipmentType type;
     [SerializeField] private int slotIndex;

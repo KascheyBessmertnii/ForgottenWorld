@@ -1,4 +1,4 @@
 public interface IGetSlotItem
 {
-    ItemSO GetSlotItem(Slot slot);
+    ItemSO GetSlotItem(SlotUI slot);
 }

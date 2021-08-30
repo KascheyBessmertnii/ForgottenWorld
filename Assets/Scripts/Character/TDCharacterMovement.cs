@@ -5,7 +5,7 @@ using UnityEngine.AI;
 public class TDCharacterMovement : MonoBehaviour
 {
     private NavMeshAgent agent;
-    private IAnimator animator;
+    protected ICharacterAnimator animator;
 
     private void LateUpdate()
     {

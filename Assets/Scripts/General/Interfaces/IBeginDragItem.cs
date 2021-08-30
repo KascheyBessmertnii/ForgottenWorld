@@ -2,10 +2,10 @@ using UnityEngine;
 
 public interface IBeginDragItem
 {
-    void BeginDrag(Slot slot);
+    void BeginDrag(SlotUI slot);
 }
 
 public interface IEndDragItem
 {
-    void EndDrag(Slot slot);
+    void EndDrag(SlotUI slot);
 }

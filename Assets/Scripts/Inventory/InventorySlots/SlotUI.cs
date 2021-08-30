@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Slot : MonoBehaviour, ISlot, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
+public class SlotUI : MonoBehaviour, ISlot, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] protected Image slotImage = default;
 
@@ -71,7 +71,7 @@ public class Slot : MonoBehaviour, ISlot, IPointerClickHandler, IBeginDragHandle
         }
         else
         {
-            var obj = eventData.pointerEnter.transform.GetComponent<Slot>(); //Check object under cursor
+            var obj = eventData.pointerEnter.transform.GetComponent<SlotUI>(); //Check object under cursor
             EndDragEvent(obj ?? this); //If its slot, move to slot else return item to current slot
         }
 
@@ -88,7 +88,7 @@ public class Slot : MonoBehaviour, ISlot, IPointerClickHandler, IBeginDragHandle
         ItemSO item = inventory.GetSlotItem(this);
         ShowIcon(item?.icon);
     }
-    protected void EndDragEvent(Slot slot)
+    protected void EndDragEvent(SlotUI slot)
     {
         GameEvents.OnEndDrag?.Invoke(slot);
     }

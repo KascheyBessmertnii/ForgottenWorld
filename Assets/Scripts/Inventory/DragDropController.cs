@@ -3,9 +3,9 @@ using UnityEngine.UI;
 
 public class DragDropController : MonoBehaviour, IBeginDragItem, IEndDragItem
 {
-    [SerializeField] private Image dragDropImage;
+    [SerializeField] private Image dragDropImage = default;
 
-    private Slot startSlot = null;
+    private SlotUI startSlot = null;
 
     private void Start()
     {
@@ -36,13 +36,13 @@ public class DragDropController : MonoBehaviour, IBeginDragItem, IEndDragItem
         dragDropImage.gameObject.SetActive(icon != null);
     }
 
-    public void BeginDrag(Slot slot)
+    public void BeginDrag(SlotUI slot)
     {
         startSlot = slot;
         UpdateImage(slot.Icon);
     }
 
-    public void EndDrag(Slot slot)
+    public void EndDrag(SlotUI slot)
     {
         if (slot == null)
             PlayerInventoryController.Instance.DropItemToGround(startSlot);
