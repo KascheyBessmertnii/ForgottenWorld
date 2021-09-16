@@ -1,4 +1,4 @@
 public interface IAnimationState
 {
-    IAnimationState DoState(OpenCloseBaseClass obj);
+    IAnimationState DoState(OpenCloseSM obj);
 }

@@ -67,7 +67,7 @@ public class SlotUI : MonoBehaviour, ISlot, IPointerClickHandler, IBeginDragHand
     {
         if (eventData.pointerEnter == null)
         {
-            EndDragEvent(null); //If drop not in inventory slot set insdex as -1      
+            EndDragEvent(null); //If drop not in inventory slot set insdex as null     
         }
         else
         {

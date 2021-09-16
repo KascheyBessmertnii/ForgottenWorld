@@ -24,11 +24,12 @@ public class TDCharacterController : TDCharacterMovement
         Move();
         MouseAction.Interract((int)interractButton, interractLayer);
         Crouch();
+        BattleMode();
     }
 
     private void Move()
     {
-        if (Input.GetMouseButtonDown((int)moveButton) && !GameStates.inventoryOpen)
+        if (Input.GetMouseButtonDown((int)moveButton) && !GameStates.InventoryOpen)
         {
             MoveTo(MouseAction.Move(movableLayer), speed);
         }
@@ -40,5 +41,14 @@ public class TDCharacterController : TDCharacterMovement
         {
             animator.Crouching(crouch = !crouch);
         }       
+    }
+
+    private void BattleMode()
+    {
+        if(Input.GetKeyDown(KeyCode.B))
+        {
+            animator.ToBattleMode(!GameStates.BattleMode);
+            GameStates.BattleMode = !GameStates.BattleMode;
+        }
     }
 }

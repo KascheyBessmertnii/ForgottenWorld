@@ -97,7 +97,6 @@ public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
         bool CanPlaceInEndSlot = targetObj.CanPlaceItem(startObj.GetItemIdInSlot(startSlot.Index), endSlot.Index);
 
         if ( CanPlaceInStartSlot && CanPlaceInEndSlot)
-        //if (CanPlaceItem(startSlot, endSlot, startObj))
         {
             int tmpItem = startObj.GetItemIdInSlot(startSlot.Index);
             int tmpCount = startObj.GetItemsCountInSlot(startSlot.Index);
@@ -110,13 +109,5 @@ public class PlayerInventoryController : PlayerInventoryUI, IGetSlotItem
     private Inventory GetTargetInventory(SlotUI slot)
     {
         return slot.GetSlotType() == EquipmentType.None ? inventory : equipment;
-    }
-
-    private bool CanPlaceItem(SlotUI startSlot, SlotUI endSlot, Inventory startInv)
-    {
-        if (endSlot.GetSlotType() == EquipmentType.None) return true; //If move to inventory (backpack) always return true.
-
-        var startItem = startInv.GetItemInSlot(startSlot.Index);
-        return startItem.EquipmentSlot() == endSlot.GetSlotType(); //If move to eqipment and type equals return true.
     }
 }

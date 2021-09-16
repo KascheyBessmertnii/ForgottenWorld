@@ -1,4 +1,6 @@
 public static class GameStates
 {
-    public static bool inventoryOpen = true;
+    public static bool InventoryOpen { get; set; } = true;
+
+    public static bool BattleMode { get; set; } = false;
 }

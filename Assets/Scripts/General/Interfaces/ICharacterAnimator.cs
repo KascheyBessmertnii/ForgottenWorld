@@ -1,4 +1,4 @@
-public interface ICharacterAnimator : ICrouch
+public interface ICharacterAnimator : ICrouch, IBattle
 {
     public void Walk(float value);
 }

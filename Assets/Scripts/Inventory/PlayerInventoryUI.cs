@@ -43,7 +43,7 @@ public class PlayerInventoryUI : MonoBehaviour
     {
         inventorySlotsContainer.parent.gameObject.SetActive(!inventorySlotsContainer.parent.gameObject.activeSelf);
         equipmentSlotContainer.parent.gameObject.SetActive(!equipmentSlotContainer.parent.gameObject.activeSelf);
-        GameStates.inventoryOpen = inventorySlotsContainer.parent.gameObject.activeSelf;
+        GameStates.InventoryOpen = inventorySlotsContainer.parent.gameObject.activeSelf;
     }
 
     private void SetSlotsState(Transform slotsContainer, int size)

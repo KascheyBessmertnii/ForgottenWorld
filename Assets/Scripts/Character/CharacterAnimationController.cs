@@ -9,6 +9,11 @@ public class CharacterAnimationController : MonoBehaviour, ICharacterAnimator
         animator.SetBool("Crouching", state);
     }
 
+    public void ToBattleMode(bool state)
+    {
+        animator.SetBool("BattleMode", state);
+    }
+
     public void Walk(float value)
     {
         animator.SetFloat("Move", value);

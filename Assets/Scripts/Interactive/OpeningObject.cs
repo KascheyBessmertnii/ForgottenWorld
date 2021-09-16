@@ -1,9 +1,9 @@
 using UnityEngine;
 
-[RequireComponent(typeof(OpenCloseBaseClass))]
+[RequireComponent(typeof(OpenCloseSM))]
 public class OpeningObject : InteractiveObject
 {
-    private OpenCloseBaseClass stateMashine;
+    private OpenCloseSM stateMashine;
     private void OnEnable()
     {
         TryGetComponent(out stateMashine);

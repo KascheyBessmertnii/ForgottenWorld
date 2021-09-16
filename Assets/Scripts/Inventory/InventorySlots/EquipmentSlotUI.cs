@@ -4,13 +4,11 @@ using UnityEngine.EventSystems;
 public class EquipmentSlotUI : SlotUI
 {
     [SerializeField] private EquipmentType type;
-    [SerializeField] private int slotIndex;
 
     public override void OnPointerClick(PointerEventData eventData)
     {
         GameEvents.OnShowItemInfo?.Invoke("Click to " + type + " slot");
     }
-
 
     public override EquipmentType GetSlotType()
     {
